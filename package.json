@@ -1,0 +1,12 @@
+{
+  "name": "askdata-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Data analyst agent: plain-English questions to read-only SQL and charts, in the browser (DuckDB-WASM / sql.js). Demo rules with no key, or bring your own AI key.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "samples": "node scripts/build-samples.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

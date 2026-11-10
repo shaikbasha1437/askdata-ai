@@ -1,0 +1,21 @@
+product_id,product_name,category,list_price,unit_cost,launched
+P01,Driftwood Earbuds,Audio,78.99,42.93,2022-05-03
+P02,Harbor Speaker,Audio,18.99,8.66,2022-08-12
+P03,Quill Headphones,Audio,198.99,80.67,7/16/2022
+P04,Echo Mini Speaker,Audio,18.99,7.4,2022-02-14
+P05,Pulse Band,Wearables,23.99,11.86,8/21/2024
+P06,Orbit Watch,Wearables,98.99,40.29,2022-06-07
+P07,Stride Clip,Wearables,128.99,72.58,2023-12-25
+P08,Lumen Desk Lamp,Home,38.99,18.38,2022-06-27
+P09,Ember Kettle,Home,198.99,102.22,2/3/2023
+P10,Nimbus Air Purifier,Home,148.99,86.17,2024-06-13
+P11,Fern Plant Sensor,Home,128.99,55.64,2023-06-09
+P12,Canvas Laptop Sleeve,Accessories,328.99,135.66,6/15/2024
+P13,Braided USB-C Cable,Accessories,38.99,16.47,2024-06-27
+P14,Magnetic Charger,Accessories,18.99,8.73,2023-03-16
+P15,Trail Backpack,Accessories,28.99,15.16,3/16/2023
+P16,Ridge Keyboard,Computing,328.99,119.14,11/20/2023
+P17,Glide Mouse,Computing,18.99,9.11,2023-12-25
+P18,Vista 27in Monitor,Computing,18.99,8.79,2024-08-13
+P19,Cove USB Hub,Computing,28.99,10.74,3/24/2023
+P20,Atlas Webcam,Computing,78.99,29.51,2022-04-09

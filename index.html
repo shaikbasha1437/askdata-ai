@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#11324d">
+<meta name="description" content="AskData AI turns plain-English questions into read-only SQL, runs them in your browser with DuckDB-WASM or SQLite, and draws the chart. Free demo mode with no key; bring your own AI key for harder questions.">
+<title>AskData AI · Ask your data in plain English</title>
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<script>try{var t=localStorage.getItem('askdata.theme');if(t==='"dark"'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#ask-q">Skip to the question box</a>
+<header class="top">
+  <a class="brand" href="./" aria-label="AskData AI home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="34" width="12" height="24" rx="3" fill="currentColor"/><rect x="26" y="20" width="12" height="38" rx="3" fill="currentColor" opacity=".8"/><rect x="46" y="8" width="12" height="50" rx="3" fill="currentColor" opacity=".6"/></svg><span>AskData <b>AI</b></span></a>
+  <span class="tag">DATA ANALYST AGENT</span>
+  <nav>
+    <button id="btn-about" type="button" title="How it works and limits">ⓘ <span class="hide-sm">Limits</span></button>
+    <button id="btn-theme" type="button" aria-label="Toggle light or dark theme">◐</button>
+    <button id="btn-settings" type="button">⚙ <span class="hide-sm">Settings</span></button>
+  </nav>
+</header>
+<main>
+  <section class="hero">
+    <p class="eyebrow">PROJECT 07 · THE DATA ANALYST AGENT</p>
+    <h1>Ask your data in <em>plain English</em>.</h1>
+    <p class="lede">Drop a CSV, JSON or Parquet file (or use the demo shop). Each question becomes read-only SQL that runs in your browser. You get the result, a chart, a short answer and a clause-by-clause explanation. Demo mode needs no key. Add your own AI key for harder questions.</p>
+    <div class="status-row"><span id="engine-pill" class="pill">SQL engine: starting…</span><span id="mode-pill" class="pill">Demo rules · no key</span><span id="offline-pill" class="pill warn" hidden>Offline</span></div>
+  </section>
+
+  <div id="share-banner" class="banner" hidden></div>
+
+  <div class="layout">
+    <aside class="panel data-panel" aria-labelledby="data-h">
+      <div class="panel-head"><h2 id="data-h">Data</h2><span id="data-count" class="muted small"></span></div>
+      <div class="data-actions">
+        <label class="button primary" for="file-input">↑ Add file</label>
+        <input id="file-input" type="file" multiple accept=".csv,.tsv,.txt,.json,.ndjson,.jsonl,.parquet,text/csv,application/json" hidden>
+        <button id="btn-paste" type="button">⎘ Paste</button>
+        <button id="btn-demo" type="button" title="Load the fictional demo tables">★ Demo data</button>
+      </div>
+      <div id="drop" class="drop">or drop CSV / TSV / JSON / Parquet files anywhere</div>
+      <div id="tables" class="tables" aria-live="polite"><p class="muted small">Loading…</p></div>
+    </aside>
+
+    <section class="panel ask-panel" aria-labelledby="ask-h">
+      <h2 id="ask-h" class="sr-only">Ask a question</h2>
+      <form id="ask-form" class="ask-form" novalidate>
+        <label for="ask-q" class="sr-only">Your question</label>
+        <textarea id="ask-q" rows="2" maxlength="2000" placeholder="e.g. Top 5 products by revenue in 2026" autocomplete="off"></textarea>
+        <div class="ask-row">
+          <div class="seg" role="group" aria-label="Who writes the SQL">
+            <button type="button" id="mode-demo" aria-pressed="true">Demo rules</button>
+            <button type="button" id="mode-llm" aria-pressed="false">Your AI</button>
+          </div>
+          <span class="spacer"></span>
+          <button id="ask-btn" class="primary" type="submit">Ask</button>
+        </div>
+      </form>
+      <div class="samples-wrap"><span class="muted small">Try:</span><div id="samples" class="samples"></div></div>
+      <div id="status" class="status" role="status" hidden></div>
+      <div id="result" class="result" tabindex="-1">
+        <div class="empty-state"><svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true"><rect x="6" y="34" width="12" height="24" rx="3" fill="currentColor"/><rect x="26" y="20" width="12" height="38" rx="3" fill="currentColor" opacity=".8"/><rect x="46" y="8" width="12" height="50" rx="3" fill="currentColor" opacity=".6"/></svg><h3>Ask something about the loaded tables</h3><p>Pick a sample question, or type your own. Every query is checked before it runs: it must be a single read-only SELECT on the loaded tables.</p></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel lower" aria-label="Notebook and dashboard">
+    <div class="lower-head">
+      <div class="seg" role="tablist" aria-label="Saved work">
+        <button type="button" id="tab-notebook" role="tab" aria-selected="true" aria-pressed="true">Notebook <span id="nb-count" class="count-badge">0</span></button>
+        <button type="button" id="tab-dashboard" role="tab" aria-selected="false" aria-pressed="false">Dashboard <span id="db-count" class="count-badge">0</span></button>
+      </div>
+      <span class="spacer"></span>
+      <div id="lower-tools" class="lower-tools"></div>
+    </div>
+    <div id="lower-body" class="lower-body"></div>
+  </section>
+</main>
+<footer class="foot">
+  <p>Everything runs in your browser. Demo data is fictional (*.example). In “Your AI” mode the schema, a few sample values and (if you allow it) up to 30 result rows go to the provider you choose. Your key stays in this browser and never goes into exports or share links.</p>
+  <p><a href="https://github.com/shaikbasha1437/askdata-ai" target="_blank" rel="noopener">Source on GitHub ↗</a> · MIT license · DuckDB-WASM / sql.js</p>
+</footer>
+<div id="modal-host"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="./vendor/sqljs/sql-wasm.js"></script>
+<script src="./js/llm.js"></script>
+<script src="./js/data.js"></script>
+<script src="./js/sqlguard.js"></script>
+<script src="./js/nl.js"></script>
+<script src="./js/chart.js"></script>
+<script src="./js/agent.js"></script>
+<script src="./js/report.js"></script>
+<script src="./js/engine.js"></script>
+<script src="./js/store.js"></script>
+<script src="./js/webllm.js"></script>
+<script src="./js/app.js"></script>
+<script>if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});</script>
+</body>
+</html>
