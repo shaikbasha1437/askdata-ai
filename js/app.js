@@ -52,8 +52,8 @@
   }
   function history_push() { window.history.pushState({ askdataModal: true }, ''); }
   function removeModal() { modal = null; $('#modal-host').innerHTML = ''; document.body.style.overflow = ''; if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus(); }
-  function closeModal(force) { if (!modal) return; if (!force && modal.dirty && !confirm('Discard unsaved changes?')) return; modal.dirty = false; window.history.back(); }
-  addEventListener('popstate', () => { if (!modal) return; if (modal.dirty && !confirm('Discard unsaved changes?')) { window.history.pushState({ askdataModal: true }, ''); return; } removeModal(); });
+  function closeModal(force) { if (!modal || modal.closing) return; if (!force && modal.dirty && !confirm('Discard unsaved changes?')) return; modal.dirty = false; modal.closing = true; const m = modal; window.history.back(); setTimeout(() => { if (modal === m) removeModal(); }, 800); }
+  addEventListener('popstate', () => { if (!modal) return; if (!modal.closing && modal.dirty && !confirm('Discard unsaved changes?')) { window.history.pushState({ askdataModal: true }, ''); return; } removeModal(); });
   addEventListener('keydown', (e) => {
     if (!modal) return;
     if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }

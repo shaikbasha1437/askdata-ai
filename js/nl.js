@@ -154,13 +154,23 @@
     // 4. Pick the measure column (numeric) and the base table.
     const numericHits = colHits.filter((h) => isNum(h.c) && !h.c.idLike && !/_id$/.test(h.c.name) && h.w >= 0.5);
     const scoreTable = (t) => tableHits.filter((h) => h.t === t).reduce((s, h) => s + h.score, 0) + colHits.filter((h) => h.t === t).reduce((s, h) => s + h.w * 0.5, 0) + vals.filter((h) => h.t === t).length;
+    // When the question needs dates (a time grain or a date filter), prefer tables that have one (directly or via a shared *_id key).
+    const needsDate = !!grain || has(/\b(19|20)\d{2}\b|\b(last|past|since|before|after|this|previous)\s+(\d+\s+)?(days?|weeks?|months?|quarters?|years?|[0-9]{4})\b|\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/);
+    const isDated = (t) => t.columns.some((c) => c.type === 'DATE' || c.type === 'TIMESTAMP');
+    const dateFit = (t) => (!needsDate ? 0 : isDated(t) ? 2 : idx.tables.some((o) => o !== t && isDated(o) && o.columns.some((oc) => /_id$/.test(oc.name) && t.columns.some((tc) => tc.name === oc.name))) ? 1 : 0);
+    // Prefer measure tables that are named in the question or join to a named table / matched value ("top products by revenue").
+    const shareKey = (a, b) => a.columns.some((ac) => /_id$/.test(ac.name) && b.columns.some((bc) => bc.name === ac.name));
+    const named = new Set(tableHits.map((h) => h.t).concat(vals.map((h) => h.t)));
+    const linkFit = (t) => (named.has(t) ? 2 : Array.from(named).some((o) => shareKey(t, o)) ? 1 : 0);
+    // "total qty": a leading "total"/"sum" is the aggregate, not the column called total, when another numeric column is named after it.
+    const ew = (h) => (/^(total|sum)$/.test(h.phrase) && numericHits.some((o) => o.c !== h.c && o.m.index > h.m.index) ? Math.min(h.w, 0.4) : h.w);
     let measure = null;
     if (numericHits.length) {
-      const best = numericHits.slice().sort((a, b) => b.w - a.w || b.m.length - a.m.length || scoreTable(b.t) - scoreTable(a.t))[0];
+      const best = numericHits.slice().sort((a, b) => ew(b) - ew(a) || dateFit(b.t) - dateFit(a.t) || linkFit(b.t) - linkFit(a.t) || b.m.length - a.m.length || scoreTable(b.t) - scoreTable(a.t))[0];
       const rivals = numericHits.filter((h) => h.phrase === best.phrase && h.c !== best.c);
       measure = best;
       if (rivals.length) {
-        const pref = rivals.concat([best]).sort((a, b) => b.w - a.w || scoreTable(b.t) - scoreTable(a.t))[0];
+        const pref = rivals.concat([best]).sort((a, b) => ew(b) - ew(a) || dateFit(b.t) - dateFit(a.t) || linkFit(b.t) - linkFit(a.t) || scoreTable(b.t) - scoreTable(a.t))[0];
         measure = pref;
         const others = rivals.concat([best]).filter((h) => h !== pref);
         res.ambiguities.push('"' + best.phrase + '" could mean ' + [pref].concat(others).map((h) => h.t.name + '.' + h.c.name).join(' or ') + '. I used ' + pref.t.name + '.' + pref.c.name + '; name the column to pick another.');

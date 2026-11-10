@@ -137,3 +137,24 @@ test('DuckDB dialect output differs only in date functions', () => {
   assert.match(a.sql, /strftime\(order_date, '%Y-%m'\)/); assert.match(b.sql, /strftime\('%Y-%m', order_date\)/);
   assert.match(NL.translate('total new accounts by quarter', sc, { dialect: 'duckdb' }).sql, /quarter\("month"\)/);
 });
+test('an extra undated table with an "amount" column does not hijack dated revenue questions', async () => {
+  const ts = H.demoTables(); const extra = DATA.fromDelimited('pasted_sales', 'rep,deals,amount\nAvery,3,1200\nJordan,5,800\n'); extra.profile = DATA.profile(extra); ts.push(extra);
+  const e = await H.sqliteWith(ts); const sc = DATA.schemaOf(ts);
+  const q = (s) => AGENT.ask({ question: s, schema: sc, dialect: 'sqlite', exec: (x) => e.exec(x) });
+  const r = await q('Revenue by month');
+  assert.equal(r.result.rows.length, 18); assert.match(r.sql, /FROM orders/);
+  const y = await q('Revenue by region in 2026');
+  assert.equal(y.result.rows.length, 4);
+  assert.deepEqual((await q('Total amount by rep')).result.rows, [['Avery', 1200], ['Jordan', 800]]);
+});
+test('extra uploaded tables: "Top 5 products by revenue" stays on orders, "Total qty" uses the qty column', async () => {
+  const ts = H.demoTables();
+  const extra = DATA.fromDelimited('pasted_sales', 'rep,deals,amount\nAvery,3,1200\nJordan,5,800\n'); extra.profile = DATA.profile(extra); ts.push(extra);
+  const inv = DATA.fromDelimited('inventory', 'sku,qty,price\nA1,3,9.5\nB2,5,20\nC3,2,7.25\nD4,10,1\n'); inv.profile = DATA.profile(inv); ts.push(inv);
+  const e = await H.sqliteWith(ts); const sc = DATA.schemaOf(ts);
+  const q = (s) => AGENT.ask({ question: s, schema: sc, dialect: 'sqlite', exec: (x) => e.exec(x) });
+  const t5 = await q('Top 5 products by revenue');
+  assert.equal(t5.result.rows[0][t5.result.rows[0].length - 1], 9442.01);
+  assert.equal((await q('Total qty')).result.rows[0][0], 20);
+  assert.equal((await q('Total amount by rep')).result.rows.length, 2);
+});

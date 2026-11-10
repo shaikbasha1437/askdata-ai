@@ -1,7 +1,7 @@
 /* Network-first for this site's own files (each cached individually, versioned cache name);
    cache-first for the pinned, immutable DuckDB-WASM files on jsDelivr so DuckDB also works offline.
    AI provider traffic and anything else cross-origin is never touched. */
-const VERSION = 'askdata-v1';
+const VERSION = 'askdata-v2';
 const CDN = 'askdata-cdn-v1';
 const FILES = ['./', './index.html', './styles.css', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png',
   './js/app.js', './js/llm.js', './js/data.js', './js/sqlguard.js', './js/nl.js', './js/chart.js', './js/agent.js', './js/report.js', './js/engine.js', './js/store.js', './js/webllm.js',
