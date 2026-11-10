@@ -54,6 +54,10 @@ Tests: `node --test test/*.test.js`. They cover the CSV/JSON loader, date and ty
 - Files are limited to 100 MB and 200,000 rows. DuckDB runs single-threaded in the browser. Long-running sql.js queries cannot be interrupted.
 - Uploaded tables are kept in this browser's IndexedDB until you remove them. Nothing is uploaded anywhere.
 
+## Verification
+
+See [VERIFICATION.md](VERIFICATION.md) for the live-site browser checks and the independently cross-checked numbers.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
