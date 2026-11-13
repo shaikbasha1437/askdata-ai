@@ -4,8 +4,6 @@ Ask a question in plain English and get read-only SQL, the result table, a chart
 
 **Live demo:** https://shaikbasha1437.github.io/askdata-ai/ (works without a key)
 
-Project 7 of a 15-part series of practical AI agents.
-
 ## What it does
 
 - **Load data:** drop or pick CSV, TSV, JSON / JSON Lines or Parquet files, or paste from a spreadsheet. Two fictional demo datasets are bundled: a small shop (`orders`, `customers`, `products`) and SaaS metrics (`saas_metrics`). Both are deliberately messy, with mixed date formats, NULLs, duplicate rows, stray spaces and two prompt-injection strings hidden in customer notes.
